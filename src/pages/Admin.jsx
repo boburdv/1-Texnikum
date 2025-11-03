@@ -3,11 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabase";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 
-const ADMIN_EMAIL = "admin@admin.uz";
-
 export default function AdminPanel() {
   const navigate = useNavigate();
-  const searchInputRef = useRef(null);
+  const searchRef = useRef(null);
 
   const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
@@ -28,18 +26,11 @@ export default function AdminPanel() {
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user || user.email !== ADMIN_EMAIL) {
-        navigate("/auth", { replace: true });
-        return;
-      }
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return navigate("/auth", { replace: true });
       setUser(user);
       setLoadingUser(false);
-    };
-    fetchUser();
+    });
   }, [navigate]);
 
   useEffect(() => {
@@ -48,7 +39,7 @@ export default function AdminPanel() {
       if (cats) setCategories(cats);
 
       const { data: adsData } = await supabase.from("ads").select("*").order("created_at", { ascending: false });
-      if (adsData) setAds(adsData.filter((ad) => ad && ad.title));
+      if (adsData) setAds(adsData.filter((ad) => ad?.title));
     };
     fetchData();
   }, []);
@@ -57,7 +48,7 @@ export default function AdminPanel() {
     const handleShortcut = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        searchInputRef.current?.focus();
+        searchRef.current?.focus();
       }
     };
     window.addEventListener("keydown", handleShortcut);
@@ -76,25 +67,17 @@ export default function AdminPanel() {
     }
 
     let image_url = null;
-
     if (image) {
       const fileExt = image.name.split(".").pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `ads/${fileName}`;
-
+      const filePath = `ads/${Date.now()}.${fileExt}`;
       const { data: uploadData, error: uploadError } = await supabase.storage.from("ads").upload(filePath, image, { upsert: true });
-      if (uploadError) {
-        setMessage("Rasm yuklanmadi!");
-        setLoading(false);
-        return;
-      }
-
+      if (uploadError) return setMessage("Rasm yuklanmadi!"), setLoading(false);
       const { data: urlData } = supabase.storage.from("ads").getPublicUrl(filePath);
       image_url = urlData.publicUrl;
     }
 
     if (editingId) {
-      const { data: updatedAds, error } = await supabase
+      const { data: updated, error } = await supabase
         .from("ads")
         .update({
           title,
@@ -106,13 +89,9 @@ export default function AdminPanel() {
         })
         .eq("id", editingId)
         .select();
-
-      if (!error && updatedAds && updatedAds[0]) {
-        setAds((prev) => prev.map((ad) => (ad.id === editingId ? updatedAds[0] : ad)));
-        setMessage("E’lon yangilandi!");
-      }
-
+      if (!error && updated?.[0]) setAds((prev) => prev.map((ad) => (ad.id === editingId ? updated[0] : ad)));
       setEditingId(null);
+      setMessage("E’lon yangilandi!");
     } else {
       const { data: newAds, error } = await supabase
         .from("ads")
@@ -128,11 +107,8 @@ export default function AdminPanel() {
           },
         ])
         .select();
-
-      if (!error && newAds && newAds[0]) {
-        setAds((prev) => [newAds[0], ...prev]);
-        setMessage("E’lon qo‘shildi!");
-      }
+      if (!error && newAds?.[0]) setAds((prev) => [newAds[0], ...prev]);
+      setMessage("E’lon qo‘shildi!");
     }
 
     setLoading(false);
@@ -144,7 +120,7 @@ export default function AdminPanel() {
     setImage(null);
 
     const { data: adsData } = await supabase.from("ads").select("*").order("created_at", { ascending: false });
-    if (adsData) setAds(adsData.filter((ad) => ad && ad.title));
+    if (adsData) setAds(adsData.filter((ad) => ad?.title));
   };
 
   const handleDelete = async (id) => {
@@ -162,7 +138,7 @@ export default function AdminPanel() {
     setSubCategory(ad.sub_category || "");
   };
 
-  const filteredAds = ads.filter((ad) => ad && ad.title).filter((ad) => ad.title.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredAds = ads.filter((ad) => ad?.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
   if (loadingUser) return <div>Loading...</div>;
   if (!user) return null;
@@ -217,7 +193,7 @@ export default function AdminPanel() {
 
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-5">
-            <input ref={searchInputRef} type="text" className="input grow" placeholder="E’lon nomi bo‘yicha qidirish..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+            <input ref={searchRef} type="text" className="input grow" placeholder="E’lon nomi bo‘yicha qidirish..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
             <kbd className="kbd kbd-sm">⌘</kbd>
             <kbd className="kbd kbd-sm">K</kbd>
           </div>
@@ -240,8 +216,8 @@ export default function AdminPanel() {
                     </div>
                   </div>
                 ))
-              : [1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="bg-base-100 shadow rounded-lg p-4.5 flex justify-between items-center animate-pulse">
+              : Array.from({ length: 5 }).map((i) => (
+                  <div key={i} className="bg-base-100 shadow rounded-lg p-4 flex justify-between items-center animate-pulse">
                     <div className="pr-4 w-full">
                       <div className="h-5 bg-gray-300 rounded w-1/2 mb-2"></div>
                       <div className="h-3 bg-gray-300 rounded w-full"></div>
