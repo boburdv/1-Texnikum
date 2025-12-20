@@ -12,7 +12,7 @@ export default function Footer() {
   ];
 
   return (
-    <div className="border-t border-base-300">
+    <div className="border-t border-base-300 bg-base-200">
       <footer className="footer sm:footer-horizontal text-base-content py-10 max-w-6xl mx-auto flex flex-wrap justify-between">
         <div>
           <a href="/" className="text-3xl font-semibold text-gray-700">

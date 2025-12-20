@@ -25,9 +25,10 @@ export default function AdminPanel() {
 
   const [searchQuery, setSearchQuery] = useState("");
 
+  const ADMIN_EMAIL = "admin@admin.uz";
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return navigate("/auth", { replace: true });
+      if (!user || user.email !== ADMIN_EMAIL) return navigate("/auth", { replace: true });
       setUser(user);
       setLoadingUser(false);
     });

@@ -94,11 +94,11 @@ export default function Header() {
                   <div className="bg-primary text-white w-8 h-8 flex items-center justify-center">{user.user_metadata?.full_name?.[0]?.toUpperCase() ?? "U"}</div>
                 </button>
                 <ul tabIndex={0} className="dropdown-content menu bg-base-100 rounded-box w-52 shadow mt-3 p-2">
-                  <li className="font-semibold px-2 py-1">{user.user_metadata?.full_name ?? "Foydalanuvchi"}</li>
                   <li>
-                    <Link to="/chat" className="font-semibold">
-                      Izohlar
-                    </Link>
+                    <span>{user.user_metadata?.full_name ?? "Foydalanuvchi"}</span>
+                  </li>
+                  <li>
+                    <Link to="/chat">Izohlar</Link>
                   </li>
                   <li>
                     <button onClick={handleLogout}>Hisobdan chiqish</button>
