@@ -1,59 +1,57 @@
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import { supabase } from "../supabase";
 
-export default function CategoryPage() {
-  const { categoryName } = useParams();
-  const [category, setCategory] = useState(null);
+export default function AdDetail() {
+  const { adId } = useParams();
+  const navigate = useNavigate();
+  const [ad, setAd] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
     supabase
-      .from("static")
+      .from("ads")
       .select("*")
-      .ilike("name", categoryName)
+      .eq("id", adId)
       .single()
       .then(({ data, error }) => {
         if (error) throw error;
-        setCategory(data);
+        setAd(data);
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [categoryName]);
+  }, [adId]);
 
-  const Skeleton = () => (
-    <div className="md:flex gap-6 w-full animate-pulse">
-      <div className="md:w-1/2 w-full aspect-3/2 lg:aspect-[4/3.2] rounded-md bg-gray-200" />
-
-      <div className="md:w-1/2 w-full mt-6 md:mt-0 space-y-4">
-        <div className="h-8 w-2/3 bg-gray-200 rounded" />
-        <div className="h-4 w-full bg-gray-200 rounded" />
-        <div className="h-4 w-full bg-gray-200 rounded" />
-        <div className="h-4 w-5/6 bg-gray-200 rounded" />
-      </div>
-    </div>
-  );
+  if (loading) return <p className="text-center mt-20">Loading...</p>;
+  if (!ad) return <p className="text-center mt-20">E'lon topilmadi.</p>;
 
   return (
-    <div className="max-w-6xl mx-auto min-h-screen p-4 flex flex-col md:flex-row md:items-center md:justify-center">
-      {loading ? (
-        <Skeleton />
-      ) : category ? (
-        <div className="md:flex gap-6 w-full">
-          {/* Image */}
-          <div className="md:w-1/2 w-full aspect-[3/2] overflow-hidden">
-            <img src={category.image_url || "/no-image.webp"} alt={category.name} className="w-full h-full object-cover rounded-md" />
-          </div>
+    <div className="max-w-6xl mx-auto p-4 lg:mt-4 flex flex-col md:flex-row gap-8">
+      {ad.image_url && <img src={ad.image_url} alt={ad.title} className="w-full md:w-1/2 h-[300px] md:h-[400px] lg:h-[450px] object-cover rounded-md shadow" />}
 
-          <div className="md:w-1/2 w-full mt-6 md:mt-0">
-            <h1 className="text-3xl font-bold mb-4">{category.name}</h1>
-            <p className="text-gray-700 whitespace-pre-line">{category.description}</p>
-          </div>
-        </div>
-      ) : (
-        <p className="text-center text-gray-500">Ma’lumot topilmadi</p>
-      )}
+      <div className="md:w-1/2 w-full flex flex-col justify-start">
+        <h2 className="text-3xl font-bold mb-4">{ad.title}</h2>
+        <p className="text-gray-700 mb-4">{ad.description}</p>
+
+        {ad.price && <p className="text-green-600 font-semibold mb-2">{ad.price} so‘m</p>}
+
+        <p className="mb-1">
+          <strong>Kategoriya:</strong> {ad.category}
+        </p>
+        <p className="mb-1">
+          <strong>Subkategoriya:</strong> {ad.sub_category}
+        </p>
+        {ad.created_at && (
+          <p className="text-gray-500 text-sm mt-2">
+            <strong>Yaratilgan sana:</strong> {new Date(ad.created_at).toLocaleString()}
+          </p>
+        )}
+
+        <button onClick={() => navigate(`/chat?category=${encodeURIComponent(ad.category)}`)} className="btn btn-primary mt-6 w-full md:w-1/2">
+          Izoh qoldirish
+        </button>
+      </div>
     </div>
   );
 }
