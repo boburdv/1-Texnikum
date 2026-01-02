@@ -39,11 +39,11 @@ export default function Footer() {
 
           <nav className="flex flex-col gap-1 items-center sm:items-start">
             <h6 className="text-gray-500 font-semibold mb-2 text-base">Bog'lanish</h6>
-            <a href="https://t.me/example" className="hover:text-primary">
+            <a href="https://t.me/+99890944411407" className="hover:text-primary">
               Telegram chat
             </a>
             <a href="tel:+998901234567" className="hover:text-primary">
-              (90) 123 45 67
+              (90) 94 441 1407
             </a>
             <a href="mailto:rishton@tech.uz" className="hover:text-primary">
               rishton@tech.uz
