@@ -49,8 +49,8 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-base-200 px-4">
-      <div className="card w-full max-w-96 bg-base-100 shadow-lg">
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="card w-full max-w-96 bg-base-100 shadow-md border border-base-200">
         <div className="card-body">
           <h2 className="card-title text-center mb-4">{isLogin ? "Kirish" : "Ro‘yxatdan o‘tish"}</h2>
           {error && <p className="text-red-500 mb-2 text-center">{error}</p>}
