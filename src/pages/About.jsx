@@ -1,12 +1,18 @@
 import { memo } from "react";
 
-const reasons = ["Lorem ipsum dolor sit amet", "Consectetur adipiscing elit", "Praesent commodo sapien", "Sem purus elementum nisi", "Sed dictum ligula arcu vel libero"];
+const reasons = [
+  "Zamonaviy kasb yo‘nalishlari bo‘yicha ta’lim",
+  "Amaliy mashg‘ulotlarga yo‘naltirilgan o‘quv jarayoni",
+  "Tajribali ustoz va o‘qituvchilar",
+  "O‘quvchilar uchun yarmarka va amaliy loyiha imkoniyatlari",
+  "Kasbga yo‘naltirish va bandlikka ko‘mak",
+];
 
-const contacts = ["Telegram chat", "(90) 94 441 1407", "info@texnikum.uz"];
+const contacts = ["Telegram: @texnikum1", "Telefon: (94) 441 14 07", "Email: info@texnikum.uz"];
 
 const About = memo(() => {
   return (
-    <div className="max-w-6xl mx-auto mt-28 lg:mt-36 mb-24 px-4">
+    <div className="max-w-6xl mx-auto lg:mt-36 mb-24 px-4">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:gap-8 gap-4">
         <div className="w-full h-72 md:h-auto overflow-hidden">
           <img src="/home-img.jpg" alt="About Image" className="w-full h-full object-cover rounded-md" loading="lazy" />
@@ -14,7 +20,8 @@ const About = memo(() => {
 
         <div className="flex flex-col justify-center space-y-6">
           <p className="text-gray-700 leading-relaxed">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent commodo, sapien in facilisis gravida, sem purus elementum nisi, sed dictum ligula arcu vel libero.
+            1-son Texnikumi zamonaviy bilim va amaliy ko‘nikmalarni uyg‘unlashtirgan holda malakali mutaxassislar tayyorlaydi. Texnikumda turli kasb yo‘nalishlari bo‘yicha ta’lim berilib,
+            o‘quvchilarning bilimlarini amaliyotda qo‘llashiga alohida e’tibor qaratiladi. Yarmarka orqali o‘quvchilar o‘zlari tayyorlagan mahsulotlarni namoyish etish va sotish imkoniyatiga ega.
           </p>
 
           <div>
