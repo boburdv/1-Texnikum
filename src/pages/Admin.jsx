@@ -8,6 +8,7 @@ import { toast } from "react-hot-toast";
 export default function AdminPanel() {
   const navigate = useNavigate();
   const searchRef = useRef(null);
+  const deleteModalRef = useRef(null);
 
   const [user, setUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(true);
@@ -24,6 +25,7 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("ads");
+  const [adToDelete, setAdToDelete] = useState(null);
 
   const ADMIN_EMAIL = "admin@admin.uz";
 
@@ -121,6 +123,11 @@ export default function AdminPanel() {
     await supabase.from("ads").delete().eq("id", id);
     setAds((prev) => prev.filter((ad) => ad.id !== id));
     showToast("E’lon muvaffaqiyatli o‘chirildi", "error");
+  };
+
+  const confirmDeleteAd = (ad) => {
+    setAdToDelete(ad);
+    deleteModalRef.current.showModal();
   };
 
   const handleEditAd = (ad) => {
@@ -226,7 +233,7 @@ export default function AdminPanel() {
                           <button className="btn btn-circle btn-ghost" onClick={() => handleEditAd(ad)}>
                             <PencilIcon className="w-5 h-5" />
                           </button>
-                          <button className="btn btn-circle btn-ghost" onClick={() => handleDeleteAd(ad.id)}>
+                          <button className="btn btn-circle btn-ghost" onClick={() => confirmDeleteAd(ad)}>
                             <TrashIcon className="w-5 h-5 text-red-600" />
                           </button>
                         </div>
@@ -247,6 +254,28 @@ export default function AdminPanel() {
 
         {activeTab === "students" && <StudentsAdmin showToast={showToast} />}
       </div>
+
+      <dialog ref={deleteModalRef} className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">Rostdan o‘chirmoqchimisiz?</h3>
+          <p className="py-4">Bu amalni qaytarib bo‘lmaydi.</p>
+          <div className="modal-action">
+            <button className="btn" onClick={() => deleteModalRef.current.close()}>
+              Bekor qilish
+            </button>
+            <button
+              className="btn btn-error"
+              onClick={() => {
+                if (adToDelete) handleDeleteAd(adToDelete.id);
+                deleteModalRef.current.close();
+              }}
+            >
+              <TrashIcon className="w-5 h-5" />
+              O‘chirish
+            </button>
+          </div>
+        </div>
+      </dialog>
     </div>
   );
 }
