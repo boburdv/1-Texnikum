@@ -74,29 +74,30 @@ export default function CategoryAds() {
   const filteredAds = selectedSub ? ads.filter((ad) => ad.sub_category?.toLowerCase() === selectedSub.toLowerCase()) : ads;
 
   const SkeletonCard = () => (
-    <div className="shadow rounded-lg overflow-hidden animate-pulse">
-      <figure className="relative aspect-[3/3.5] bg-gray-200">
-        <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-gray-300" />
+    <div className="shadow rounded-lg overflow-hidden">
+      <figure className="relative aspect-[3/3.5]">
+        <div className="bg-base-100 w-full h-full" />
+        <div className="absolute top-2 right-2 w-8 h-8 rounded-full skeleton" />
       </figure>
-      <div className="px-3 lg:px-4 py-4">
-        <div className="h-4 bg-gray-200 rounded w-4/5 mb-1" />
-        <div className="h-4 bg-gray-200 rounded w-2/5 py-0.5" />
+      <div className="px-3 lg:px-4 py-4 bg-base-100">
+        <div className="skeleton h-4 w-4/5 rounded mb-1" />
+        <div className="skeleton h-4 w-2/5 rounded" />
       </div>
     </div>
   );
 
-  const skeletonCards = Array.from({ length: 5 }, (_, i) => <SkeletonCard key={i} className="max-w-6xl mx-auto px-4 mb-4" />);
+  const skeletonCards = Array.from({ length: 5 }, (_, i) => <SkeletonCard key={i} />);
 
   return (
     <>
       <div className="sticky top-0 z-30 bg-white mb-4 shadow-xs">
-        <div className="max-w-6xl mx-auto px-4 py-1 flex items-center justify-between">
+        <div className="container mx-auto px-4 py-1 flex items-center justify-between">
           {loading ? (
-            <div className="w-full animate-pulse">
-              <div className="h-7 w-64 bg-gray-200 rounded mb-2" />
+            <div className="w-full">
+              <div className="skeleton h-7 w-64 rounded mb-2" />
               <div className="flex gap-2">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="h-9.5 w-24 bg-gray-200 rounded-sm" />
+                  <div key={i} className="skeleton h-9.5 w-24 rounded-sm" />
                 ))}
               </div>
             </div>
@@ -144,7 +145,7 @@ export default function CategoryAds() {
         </div>
 
         {!loading && subCategories.length > 0 && (
-          <div className="relative max-w-6xl mx-auto px-4">
+          <div className="relative container mx-auto px-4">
             <div className="overflow-hidden">
               <div className="flex gap-2 py-1 overflow-x-auto scroll-hidden">
                 <button onClick={() => setSelectedSub("")} className={`btn h-9 btn-soft ${selectedSub === "" ? "btn-primary" : ""}`}>
@@ -162,12 +163,12 @@ export default function CategoryAds() {
         )}
       </div>
 
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="container mx-auto px-4">
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">{skeletonCards}</div>
         ) : filteredAds.length === 0 ? (
           <div className="mt-60">
-            <p className="text-center text-lg font-medium" style={{ color: "var(--text-muted)" }}>
+            <p className="text-center text-lg font-medium" style={{ color: "var(--text-secondary)" }}>
               Hozircha joylangan e'lonlar mavjud emas.
             </p>
           </div>
@@ -175,7 +176,7 @@ export default function CategoryAds() {
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {filteredAds.map((ad) => (
               <Link key={ad.id} to={`/ad/${ad.id}`}>
-                <div className="shadow rounded-lg overflow-hidden transition-all hover:shadow-md">
+                <div className="shadow rounded-lg bg-base-100 overflow-hidden transition-all hover:shadow-md">
                   <figure className="relative aspect-[3/3.5]">
                     <button
                       onClick={(e) => {
@@ -195,16 +196,10 @@ export default function CategoryAds() {
                     {ad.sub_category && <span className="badge badge-ghost badge-sm absolute top-2 left-2 bg-white/70 backdrop-blur">{ad.sub_category}</span>}
                     <img src={ad.image_url} className="w-full h-full object-cover" />
                   </figure>
-                  <div className="shadow rounded-lg overflow-hidden hover:shadow-lg" style={{ backgroundColor: "var(--bg-card)" }}>
+                  <div className="shadow overflow-hidden">
                     <div className="px-3 lg:px-4 py-2">
-                      <h2 className="font-medium line-clamp-1" style={{ color: "var(--text-main)" }}>
-                        {ad.title}
-                      </h2>
-                      {ad.price && (
-                        <p className="font-semibold line-clamp-1 py-0.5" style={{ color: "var(--primary)" }}>
-                          {ad.price} so'm
-                        </p>
-                      )}
+                      <h2 className="font-medium line-clamp-1">{ad.title}</h2>
+                      {ad.price && <p className="font-semibold line-clamp-1 py-0.5">{ad.price} so'm</p>}
                     </div>
                   </div>
                 </div>
