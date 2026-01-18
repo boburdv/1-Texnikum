@@ -149,7 +149,7 @@ export default function StudentsAdmin() {
               </div>
             ))
           ) : (
-            <p>Ro‘yxat bo‘sh</p>
+            <p>Ro‘yxat mavjud emas.</p>
           )}
         </div>
       </div>

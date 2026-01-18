@@ -76,7 +76,6 @@ export default function Auth() {
           <h2 className="card-title text-center mb-4">{isLogin ? "Kirish" : "Ro‘yxatdan o‘tish"}</h2>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            {/* FULL NAME */}
             {!isLogin && (
               <label className="input  w-full">
                 <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -89,7 +88,6 @@ export default function Auth() {
               </label>
             )}
 
-            {/* EMAIL */}
             <label className="input  w-full">
               <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <rect width="20" height="16" x="2" y="4" rx="2" stroke="currentColor" strokeWidth="2" fill="none" />
@@ -98,7 +96,6 @@ export default function Auth() {
               <input className="flex-1 w-full" type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
             </label>
 
-            {/* PASSWORD */}
             <label className="input  w-full">
               <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path
@@ -118,7 +115,6 @@ export default function Auth() {
             </button>
           </form>
 
-          {/* GOOGLE BUTTON */}
           <button onClick={handleGoogleSignIn} disabled={googleLoading} className="btn w-full mt-2 bg-white text-black border flex items-center justify-center gap-2">
             {googleLoading ? (
               <span className="loading loading-spinner"></span>

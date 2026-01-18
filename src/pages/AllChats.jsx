@@ -118,12 +118,14 @@ export default function ChatPage() {
     );
   if (!user)
     return (
-      <p className="text-center mt-20">
-        Avval ro'yxatdan o'ting.{" "}
-        <a href="/auth" className="text-blue-700">
-          Login
-        </a>
-      </p>
+      <div className="flex justify-center items-center h-screen bg-gray-50">
+        <p className="text-center text-lg font-medium text-gray-800">
+          Avval ro'yxatdan o'tishingiz kerak.{" "}
+          <a href="/auth" className="text-blue-600 hover:underline font-semibold">
+            Login / Ro'yxatdan o'tish
+          </a>
+        </p>
+      </div>
     );
 
   return (

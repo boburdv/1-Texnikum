@@ -19,14 +19,16 @@ const About = memo(() => {
         </div>
 
         <div className="flex flex-col justify-center space-y-6">
-          <p className="text-gray-700 leading-relaxed">
+          <p className="leading-relaxed" style={{ color: "var(--text-secondary)" }}>
             1-son Texnikumi zamonaviy bilim va amaliy ko‘nikmalarni uyg‘unlashtirgan holda malakali mutaxassislar tayyorlaydi. Texnikumda turli kasb yo‘nalishlari bo‘yicha ta’lim berilib,
             o‘quvchilarning bilimlarini amaliyotda qo‘llashiga alohida e’tibor qaratiladi. Yarmarka orqali o‘quvchilar o‘zlari tayyorlagan mahsulotlarni namoyish etish va sotish imkoniyatiga ega.
           </p>
 
           <div>
-            <h2 className="text-xl font-semibold mb-3">Nima uchun biz?</h2>
-            <ul className="list-disc pl-6 space-y-2 text-gray-700">
+            <h2 className="text-xl font-semibold mb-3" style={{ color: "var(--text-main)" }}>
+              Nima uchun biz?
+            </h2>
+            <ul className="list-disc pl-6 space-y-2" style={{ color: "var(--text-secondary)" }}>
               {reasons.map((r, i) => (
                 <li key={i}>{r}</li>
               ))}
@@ -34,9 +36,11 @@ const About = memo(() => {
           </div>
 
           <div>
-            <h2 className="text-xl font-semibold mb-3">Aloqa</h2>
+            <h2 className="text-xl font-semibold mb-3" style={{ color: "var(--text-main)" }}>
+              Aloqa
+            </h2>
             {contacts.map((c, i) => (
-              <p key={i} className="text-gray-700">
+              <p key={i} style={{ color: "var(--text-secondary)" }}>
                 {c}
               </p>
             ))}

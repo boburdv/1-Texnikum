@@ -60,7 +60,7 @@ export default function Header() {
 
       <div className={`fixed top-0 left-0 right-0 z-50 bg-base-100 shadow-xs transition-transform duration-300 ${showHeader ? "translate-y-0" : "-translate-y-full"}`}>
         <div className="bg-base-200 border-b border-base-300">
-          <div className="max-w-6xl mx-auto flex justify-between items-center py-1.5 px-4 text-sm">
+          <div className="max-w-6xl mx-auto flex justify-between items-center py-1.5 px-4 text-sm text-base-content">
             <div className="flex gap-5">
               <div className="flex items-center gap-1">
                 <PhoneIcon className="w-4 h-4" /> (94) 441 14 07
@@ -75,7 +75,7 @@ export default function Header() {
               </div>
               <div className="hidden md:flex gap-1.5 ml-3">
                 {socialLinks.map((s, i) => (
-                  <a key={i} href={s.href} className="p-1 border border-base-300 rounded-lg bg-white hover:bg-primary hover:text-white">
+                  <a key={i} href={s.href} className="p-1 border border-base-300 rounded-lg bg-base-100 hover:bg-primary hover:text-primary-content">
                     {s.icon}
                   </a>
                 ))}
@@ -86,16 +86,14 @@ export default function Header() {
 
         <div className="navbar bg-base-100 px-4 max-w-6xl mx-auto">
           <div className="flex-1 justify-start">
-            <button className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-              {mobileMenuOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6 mt-1.5" />}
-            </button>
+            <button className="md:hidden">{mobileMenuOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6 mt-1.5" />}</button>
 
-            <Link to="/" className="hidden md:block text-[25px] md:ml-2 font-semibold text-gray-700">
+            <Link to="/" className="hidden md:block text-[25px] font-semibold text-base-content">
               TEXNIKUM
             </Link>
           </div>
 
-          <nav className="hidden md:flex gap-6 text-sm font-medium">
+          <nav className="hidden md:flex gap-6 text-sm font-medium text-base-content">
             <Link to="/" className="hover:text-primary">
               Bosh sahifa
             </Link>
@@ -115,7 +113,7 @@ export default function Header() {
             ) : (
               <div className="dropdown dropdown-end">
                 <button tabIndex={0} className="rounded-full overflow-hidden">
-                  <div className="bg-primary text-white w-8 h-8 flex items-center justify-center">{user.user_metadata?.full_name?.[0]?.toUpperCase() ?? "U"}</div>
+                  <div className="bg-primary text-primary-content w-8 h-8 flex items-center justify-center">{user.user_metadata?.full_name?.[0]?.toUpperCase() ?? "U"}</div>
                 </button>
                 <ul className="dropdown-content menu bg-base-100 rounded-box w-52 shadow mt-3 p-2">
                   <li className="disabled">
@@ -145,29 +143,22 @@ export default function Header() {
         {mobileMenuOpen && (
           <div className="md:hidden fixed top-0 left-0 w-full h-screen bg-base-100 shadow-md z-40 flex flex-col">
             <div className="flex items-center justify-between px-4 py-4 border-b border-base-300">
-              <Link to="/" className="text-[25px] font-semibold text-gray-700" onClick={() => setMobileMenuOpen(false)}>
+              <Link to="/" className="text-[25px] font-semibold text-base-content">
                 TEXNIKUM
               </Link>
-              <button onClick={() => setMobileMenuOpen(false)}>
+              <button>
                 <XMarkIcon className="w-6 h-6" />
               </button>
             </div>
 
-            <nav className="flex flex-col p-4 gap-3 text-sm font-medium">
-              <Link to="/" className="hover:text-primary" onClick={() => setMobileMenuOpen(false)}>
+            <nav className="flex flex-col p-4 gap-3 text-sm font-medium text-base-content">
+              <Link to="/" className="hover:text-primary">
                 Bosh sahifa
               </Link>
-              <Link to="/about" className="hover:text-primary" onClick={() => setMobileMenuOpen(false)}>
+              <Link to="/about" className="hover:text-primary">
                 Haqida
               </Link>
-              <Link
-                to="/"
-                onClick={() => {
-                  document.getElementById("yarmarka")?.scrollIntoView({ behavior: "smooth" });
-                  setMobileMenuOpen(false);
-                }}
-                className="hover:text-primary"
-              >
+              <Link to="/" onClick={() => document.getElementById("yarmarka")?.scrollIntoView({ behavior: "smooth" })} className="hover:text-primary">
                 Yarmarka
               </Link>
             </nav>

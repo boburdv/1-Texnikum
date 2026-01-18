@@ -4,10 +4,28 @@
 }
 
 .scroll-hidden::-webkit-scrollbar {
-  display: none; /* Chrome, Safari va Edge */
+  display: none;
 }
 
 .scroll-hidden {
-  -ms-overflow-style: none; /* IE va Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+:root {
+  --primary: #1d4ed8;
+  --primary-hover: #2563eb;
+  --accent: #6366f1;
+
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-muted: #f1f5f9;
+
+  --text-main: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
 }

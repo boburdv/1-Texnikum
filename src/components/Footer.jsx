@@ -12,11 +12,11 @@ export default function Footer() {
   ];
 
   return (
-    <div className="border-t border-base-300 bg-base-200">
+    <div className="border-t bg-base-200 border-base-300">
       <footer className="max-w-6xl mx-auto px-4 py-10 footer">
         <div className="flex flex-col sm:flex-row gap-10 w-full items-center sm:items-start justify-center sm:justify-between text-center sm:text-left">
           <div className="flex flex-col items-center sm:items-start max-w-xs">
-            <a href="/" className="text-3xl font-semibold text-gray-700">
+            <a href="/" className="text-3xl font-semibold text-text-main">
               TEXNIKUM
             </a>
             <a href="https://maps.app.goo.gl/rgwaKGch5jPKVe286" className="hover:text-primary max-w-60 mt-5">
@@ -25,7 +25,7 @@ export default function Footer() {
           </div>
 
           <nav className="flex flex-col gap-1 items-center sm:items-start">
-            <h6 className="text-gray-500 font-semibold mb-2 text-base">Bo'limlar</h6>
+            <h6 className="text-text-secondary font-semibold mb-2 text-base">Bo'limlar</h6>
             <a href="/" className="hover:text-primary">
               Bosh sahifa
             </a>
@@ -38,7 +38,7 @@ export default function Footer() {
           </nav>
 
           <nav className="flex flex-col gap-1 items-center sm:items-start">
-            <h6 className="text-gray-500 font-semibold mb-2 text-base">Bog'lanish</h6>
+            <h6 className="text-text-secondary font-semibold mb-2 text-base">Bog'lanish</h6>
             <a href="https://t.me/+99890944411407" className="hover:text-primary">
               Telegram chat
             </a>
@@ -51,10 +51,10 @@ export default function Footer() {
           </nav>
 
           <nav className="flex flex-col items-center sm:items-start">
-            <h6 className="text-gray-500 font-semibold mb-2 text-base">Ijtimoiy tarmoqlar</h6>
+            <h6 className="text-text-secondary font-semibold mb-2 text-base">Ijtimoiy tarmoqlar</h6>
             <div className="grid grid-flow-col gap-2">
               {socialLinks.map((s, i) => (
-                <a key={i} href={s.href} className="p-1 border border-base-300 rounded-lg bg-white hover:bg-primary hover:text-white transition">
+                <a key={i} href={s.href} className="p-1 border border-base-300 rounded-lg bg-white hover:bg-primary hover:text-primary-content">
                   {s.icon}
                 </a>
               ))}
@@ -63,7 +63,7 @@ export default function Footer() {
         </div>
       </footer>
 
-      <div className="border-t border-base-300 py-4 text-center text-sm text-base-content/70">© {year} Texnikum.work</div>
+      <div className="border-t py-4 text-center text-gray-500 text-sm border-base-300">© {year} Texnikum</div>
     </div>
   );
 }

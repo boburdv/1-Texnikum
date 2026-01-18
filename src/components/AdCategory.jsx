@@ -102,7 +102,10 @@ export default function CategoryAds() {
             </div>
           ) : (
             <>
-              <h2 className="text-[20px] font-medium text-gray-600 line-clamp-1">{category.name} bo'yicha e'lonlar</h2>
+              <h2 className="text-[20px] font-medium line-clamp-1" style={{ color: "var(--text-main)" }}>
+                {category.name} bo'yicha e'lonlar
+              </h2>
+
               <div className="dropdown dropdown-end">
                 <button className="btn btn-sm btn-ghost btn-circle">
                   <svg viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" fill="none" className="size-5">
@@ -113,13 +116,13 @@ export default function CategoryAds() {
                     />
                   </svg>
                 </button>
-                <ul className="dropdown-content menu p-2 w-80 shadow bg-base-100 rounded-box">
+                <ul className="dropdown-content menu p-2 w-80 shadow bg-base-100 border border-base-300 rounded-box">
                   {allFavorites.length === 0 ? (
                     <li className="text-gray-400 py-1 text-center">Hech qanday saralanganlar yo'q</li>
                   ) : (
                     allFavorites.map((ad) => (
-                      <li key={ad.id}>
-                        <div className="flex items-center gap-2 border-b last:border-b-0">
+                      <li key={ad.id} className="border-b border-base-200">
+                        <div className="flex items-center gap-2">
                           <Link to={`/ad/${ad.id}`} className="flex items-center gap-2 flex-1">
                             <img src={ad.image_url} className="w-12 h-12 object-cover rounded" />
                             <div>
@@ -163,12 +166,16 @@ export default function CategoryAds() {
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">{skeletonCards}</div>
         ) : filteredAds.length === 0 ? (
-          <div className="text-center text-gray-500 text-lg py-24">Hozircha joylangan e'lonlar topilmadi</div>
+          <div className="mt-60">
+            <p className="text-center text-lg font-medium" style={{ color: "var(--text-muted)" }}>
+              Hozircha joylangan e'lonlar mavjud emas.
+            </p>
+          </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {filteredAds.map((ad) => (
               <Link key={ad.id} to={`/ad/${ad.id}`}>
-                <div className="shadow rounded-lg overflow-hidden hover:shadow-lg">
+                <div className="shadow rounded-lg overflow-hidden transition-all hover:shadow-md">
                   <figure className="relative aspect-[3/3.5]">
                     <button
                       onClick={(e) => {
@@ -188,9 +195,17 @@ export default function CategoryAds() {
                     {ad.sub_category && <span className="badge badge-ghost badge-sm absolute top-2 left-2 bg-white/70 backdrop-blur">{ad.sub_category}</span>}
                     <img src={ad.image_url} className="w-full h-full object-cover" />
                   </figure>
-                  <div className="px-3 lg:px-4 py-2">
-                    <h2 className="font-medium line-clamp-1">{ad.title}</h2>
-                    {ad.price && <p className="font-semibold text-primary line-clamp-1 py-0.5">{ad.price} so'm</p>}
+                  <div className="shadow rounded-lg overflow-hidden hover:shadow-lg" style={{ backgroundColor: "var(--bg-card)" }}>
+                    <div className="px-3 lg:px-4 py-2">
+                      <h2 className="font-medium line-clamp-1" style={{ color: "var(--text-main)" }}>
+                        {ad.title}
+                      </h2>
+                      {ad.price && (
+                        <p className="font-semibold line-clamp-1 py-0.5" style={{ color: "var(--primary)" }}>
+                          {ad.price} so'm
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </Link>
