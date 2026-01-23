@@ -4,6 +4,7 @@ import { supabase } from "../supabase";
 import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import StudentsAdmin from "../components/StudentsAdmin";
 import { toast } from "react-hot-toast";
+import NewsAdmin from "../components/NewsAdmin";
 
 export default function AdminPanel() {
   const navigate = useNavigate();
@@ -20,7 +21,10 @@ export default function AdminPanel() {
   const [category, setCategory] = useState("");
   const [subCategory, setSubCategory] = useState("");
   const [price, setPrice] = useState("");
-  const [telegram, setTelegram] = useState("");
+
+  // 🔥 DEFAULT TELEGRAM QIYMAT
+  const [telegram, setTelegram] = useState("+998944411407");
+
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,7 +45,9 @@ export default function AdminPanel() {
     const fetch = async () => {
       const { data: cats } = await supabase.from("dynamic").select("*");
       if (cats) setCategories(cats);
+
       const { data: adsData } = await supabase.from("ads").select("*").order("created_at", { ascending: false });
+
       if (adsData) setAds(adsData.filter((ad) => ad?.title));
     };
     fetch();
@@ -66,6 +72,7 @@ export default function AdminPanel() {
   const handleSubmitAd = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     if (!title || !description || !category || !subCategory || !price) {
       showToast("Barcha maydonlarni to‘ldiring!", "error");
       setLoading(false);
@@ -73,47 +80,72 @@ export default function AdminPanel() {
     }
 
     let image_url = null;
+
     if (image) {
       const ext = image.name.split(".").pop();
-      const path = `ads/${Date.now()}.${ext}`;
-      const { error: uploadError } = await supabase.storage.from("ads").upload(path, image, { upsert: true });
-      if (uploadError) {
+      const fileName = `${Date.now()}.${ext}`;
+
+      const { error } = await supabase.storage.from("ads").upload(fileName, image, { upsert: true });
+
+      if (error) {
         showToast("Rasm yuklanmadi!", "error");
         setLoading(false);
         return;
       }
-      image_url = supabase.storage.from("ads").getPublicUrl(path).data.publicUrl;
+
+      image_url = supabase.storage.from("ads").getPublicUrl(fileName).data.publicUrl;
     }
 
     let telegramValue = telegram.trim();
-    if (telegramValue) {
-      if (/^\d+$/.test(telegramValue)) telegramValue = `https://t.me/${telegramValue}`;
-      else if (!telegramValue.startsWith("https://t.me/")) telegramValue = `https://t.me/${telegramValue.replace("@", "")}`;
+    if (telegramValue && !telegramValue.startsWith("https://t.me/")) {
+      telegramValue = `https://t.me/${telegramValue}`;
     }
 
     if (editingId) {
-      const { data: updated } = await supabase
+      const { data } = await supabase
         .from("ads")
-        .update({ title, description, price, category, sub_category: subCategory, telegram: telegramValue, ...(image_url && { image_url }) })
+        .update({
+          title,
+          description,
+          price,
+          category,
+          sub_category: subCategory,
+          telegram: telegramValue,
+          ...(image_url && { image_url }),
+        })
         .eq("id", editingId)
         .select();
-      if (updated?.[0]) setAds((prev) => prev.map((ad) => (ad.id === editingId ? updated[0] : ad)));
+
+      if (data?.[0]) {
+        setAds((prev) => prev.map((a) => (a.id === editingId ? data[0] : a)));
+      }
       setEditingId(null);
-      showToast("E’lon muvaffaqiyatli yangilandi!", "success");
+      showToast("E’lon yangilandi");
     } else {
-      const { data: newAds } = await supabase
+      const { data } = await supabase
         .from("ads")
-        .insert([{ title, description, price, category, sub_category: subCategory, telegram: telegramValue, image_url, created_at: new Date() }])
+        .insert([
+          {
+            title,
+            description,
+            price,
+            category,
+            sub_category: subCategory,
+            telegram: telegramValue,
+            image_url,
+          },
+        ])
         .select();
-      if (newAds?.[0]) setAds((prev) => [newAds[0], ...prev]);
-      showToast("E’lon muvaffaqiyatli qo‘shildi!", "success");
+
+      if (data?.[0]) setAds((prev) => [data[0], ...prev]);
+      showToast("E’lon qo‘shildi");
     }
 
     setLoading(false);
     setTitle("");
     setDescription("");
     setPrice("");
-    setTelegram("");
+    setTelegram("+998944411407");
     setCategory("");
     setSubCategory("");
     setImage(null);
@@ -122,7 +154,7 @@ export default function AdminPanel() {
   const handleDeleteAd = async (id) => {
     await supabase.from("ads").delete().eq("id", id);
     setAds((prev) => prev.filter((ad) => ad.id !== id));
-    showToast("E’lon muvaffaqiyatli o‘chirildi", "error");
+    showToast("E’lon o‘chirildi", "error");
   };
 
   const confirmDeleteAd = (ad) => {
@@ -131,12 +163,11 @@ export default function AdminPanel() {
   };
 
   const handleEditAd = (ad) => {
-    if (!ad) return;
     setEditingId(ad.id);
     setTitle(ad.title || "");
     setDescription(ad.description || "");
     setPrice(ad.price || "");
-    setTelegram(ad.telegram || "");
+    setTelegram(ad.telegram || "+998944411407");
     setCategory(ad.category || "");
     setSubCategory(ad.sub_category || "");
   };
@@ -149,10 +180,11 @@ export default function AdminPanel() {
         <span className="loading loading-ring loading-xl"></span>
       </div>
     );
+
   if (!user) return null;
 
   return (
-    <div className="bg-base-200 min-h-screen flex items-start justify-center p-4">
+    <div className="min-h-screen flex items-start justify-center p-4">
       <div className="max-w-4xl w-full flex flex-col gap-5">
         <div className="join mx-auto">
           <button className={`join-item btn ${activeTab === "ads" ? "btn-primary" : "btn-active"}`} onClick={() => setActiveTab("ads")}>
@@ -160,6 +192,9 @@ export default function AdminPanel() {
           </button>
           <button className={`join-item btn ${activeTab === "students" ? "btn-primary" : "btn-active"}`} onClick={() => setActiveTab("students")}>
             Statistika
+          </button>
+          <button className={`join-item btn ${activeTab === "news" ? "btn-primary" : "btn-active"}`} onClick={() => setActiveTab("news")}>
+            Yangiliklar
           </button>
         </div>
 
@@ -198,7 +233,16 @@ export default function AdminPanel() {
                 <textarea placeholder="E'lon bo'yicha batafsil" className="textarea w-full" value={description} onChange={(e) => setDescription(e.target.value)} />
                 <input type="file" className="file-input w-full" onChange={(e) => setImage(e.target.files[0])} />
                 <div className="flex gap-2">
-                  <input type="text" placeholder="Telegram @user/+998" className="input flex-1" value={telegram} onChange={(e) => setTelegram(e.target.value)} />
+                  <input
+                    type="tel"
+                    className="input flex-1 w-full"
+                    value={telegram}
+                    placeholder="Telegram raqam"
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (!isNaN(val)) setTelegram(val);
+                    }}
+                  />
                   <input type="text" placeholder="Narx/100 000" className="input flex-1" value={price} onChange={(e) => setPrice(e.target.value)} />
                 </div>
                 <button type="submit" className="btn btn-primary w-full flex items-center justify-center gap-2">
@@ -253,6 +297,8 @@ export default function AdminPanel() {
         )}
 
         {activeTab === "students" && <StudentsAdmin showToast={showToast} />}
+
+        {activeTab === "news" && <NewsAdmin />}
       </div>
 
       <dialog ref={deleteModalRef} className="modal">

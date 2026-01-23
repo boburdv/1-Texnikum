@@ -70,7 +70,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-base-200">
+    <div className="min-h-screen flex items-center justify-center px-4">
       <div className="card w-full max-w-96 bg-base-100 shadow-md">
         <div className="card-body">
           <h2 className="card-title text-center mb-4">{isLogin ? "Kirish" : "Ro‘yxatdan o‘tish"}</h2>
