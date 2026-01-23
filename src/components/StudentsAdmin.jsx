@@ -14,6 +14,7 @@ export default function StudentsAdmin() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [studentToDelete, setStudentToDelete] = useState(null);
+  const [loading, setLoading] = useState(true);
   const searchRef = useRef(null);
   const deleteModalRef = useRef(null);
 
@@ -21,6 +22,7 @@ export default function StudentsAdmin() {
     const fetchCategories = async () => {
       const { data } = await supabase.from("static").select("*").order("name");
       if (data) setCategories(data);
+      setLoading(false);
     };
     fetchCategories();
   }, []);
@@ -127,7 +129,14 @@ export default function StudentsAdmin() {
           <kbd className="kbd kbd-sm">K</kbd>
         </div>
         <div className="overflow-y-auto h-[448px] space-y-4 p-0.5 pr-1.5">
-          {filteredStudents.length > 0 ? (
+          {loading ? (
+            Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="bg-base-100 shadow rounded-lg p-4 animate-pulse">
+                <div className="h-6 bg-gray-300 rounded w-1/2 mb-2"></div>
+                <div className="h-3 bg-gray-300 rounded w-full"></div>
+              </div>
+            ))
+          ) : filteredStudents.length > 0 ? (
             filteredStudents.map((student, idx) => (
               <div key={`${student.categoryId}-${idx}`} className="bg-base-100 shadow transition-shadow duration-300 hover:shadow-md rounded-lg p-4 flex justify-between items-center">
                 <div>
