@@ -6,9 +6,9 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   const socialLinks = [
-    { icon: <SiTelegram className="w-5 h-5" />, href: "#" },
-    { icon: <FaInstagram className="w-5 h-5" />, href: "#" },
-    { icon: <GrYoutube className="w-5 h-5" />, href: "#" },
+    { icon: <SiTelegram className="w-4 h-4" />, href: "https://www.t.me/rishton_1_texnikum" },
+    { icon: <FaInstagram className="w-4 h-4" />, href: "https://www.instagram.com/rishton_1_texnikum" },
+    { icon: <GrYoutube className="w-4 h-4" />, href: "https://www.youtube.com/@rishton_1_texnikum" },
   ];
 
   return (
