@@ -6,6 +6,7 @@ import { TbNeedleThread, TbPlug, TbFlame } from "react-icons/tb";
 import { GiBee } from "react-icons/gi";
 import { MdRestaurant } from "react-icons/md";
 import News from "../components/News";
+import Staff from "../components/Staff";
 
 const iconMap = {
   "fa-computer": FaComputer,
@@ -59,6 +60,8 @@ export default function Home() {
   return (
     <div>
       <News />
+
+      <Staff />
 
       <div className="container mx-auto mt-24 mb-10 px-4">
         <h2 className="text-2xl md:text-3xl font-medium text-[var(--text-main)] mb-8">Kasb yo'nalishlari</h2>

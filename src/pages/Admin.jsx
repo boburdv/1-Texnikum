@@ -5,6 +5,7 @@ import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import StudentsAdmin from "../components/StudentsAdmin";
 import { toast } from "react-hot-toast";
 import NewsAdmin from "../components/NewsAdmin";
+import StaffAdmin from "../components/StaffAdmin";
 
 export default function AdminPanel() {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ export default function AdminPanel() {
   const [adToDelete, setAdToDelete] = useState(null);
 
   const ADMIN_EMAIL = "admin@admin.uz";
-  const DEFAULT_TELEGRAM = "+998944411407"; // 🔥 Har doim ishlatiladigan Telegram raqam
+  const DEFAULT_TELEGRAM = "+998944411407";
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -185,6 +186,11 @@ export default function AdminPanel() {
           <button className={`join-item btn ${activeTab === "news" ? "btn-primary" : "btn-active"}`} onClick={() => setActiveTab("news")}>
             Yangiliklar
           </button>
+
+          {/* ✅ YANGI TAB */}
+          <button className={`join-item btn ${activeTab === "staff" ? "btn-primary" : "btn-active"}`} onClick={() => setActiveTab("staff")}>
+            Xodimlar
+          </button>
         </div>
 
         {activeTab === "ads" && (
@@ -276,6 +282,9 @@ export default function AdminPanel() {
         {activeTab === "students" && <StudentsAdmin showToast={showToast} />}
 
         {activeTab === "news" && <NewsAdmin />}
+
+        {/* ✅ XODIMLAR */}
+        {activeTab === "staff" && <StaffAdmin showToast={showToast} />}
       </div>
 
       <dialog ref={deleteModalRef} className="modal">
