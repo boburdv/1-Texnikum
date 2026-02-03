@@ -181,13 +181,12 @@ export default function AdminPanel() {
             E’lonlar
           </button>
           <button className={`join-item btn ${activeTab === "students" ? "btn-primary" : "btn-active"}`} onClick={() => setActiveTab("students")}>
-            Statistika
+            O'quvchilar
           </button>
           <button className={`join-item btn ${activeTab === "news" ? "btn-primary" : "btn-active"}`} onClick={() => setActiveTab("news")}>
             Yangiliklar
           </button>
 
-          {/* ✅ YANGI TAB */}
           <button className={`join-item btn ${activeTab === "staff" ? "btn-primary" : "btn-active"}`} onClick={() => setActiveTab("staff")}>
             Xodimlar
           </button>
