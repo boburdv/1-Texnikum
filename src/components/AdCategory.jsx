@@ -1,92 +1,128 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "../supabase";
 import { TrashIcon } from "@heroicons/react/24/outline";
 
 const LS_KEY = "favorites_ads";
 
+function readFavorites() {
+  try {
+    return JSON.parse(localStorage.getItem(LS_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+
 export default function CategoryAds() {
   const { categoryName } = useParams();
-  const decodedCategory = decodeURIComponent(categoryName);
+  const decodedCategory = useMemo(() => decodeURIComponent(categoryName), [categoryName]);
 
   const [category, setCategory] = useState(null);
   const [subCategories, setSubCategories] = useState([]);
   const [selectedSub, setSelectedSub] = useState("");
   const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [favorites, setFavorites] = useState([]);
+
+  const [favorites, setFavorites] = useState(readFavorites);
   const [allFavorites, setAllFavorites] = useState([]);
 
-  const saveFavorites = (ids) => {
+  const saveFavorites = useCallback((ids) => {
     localStorage.setItem(LS_KEY, JSON.stringify(ids));
     setFavorites(ids);
-  };
+  }, []);
 
   useEffect(() => {
-    const loadData = async () => {
+    let cancelled = false;
+
+    (async () => {
       setLoading(true);
+
       const { data: catData } = await supabase.from("dynamic").select("*").ilike("name", decodedCategory);
+
+      if (cancelled) return;
+
       if (!catData?.length) {
         setLoading(false);
         return;
       }
+
       const current = catData[0];
       setCategory(current);
       setSubCategories(current.sub || []);
+
       const { data: adsData } = await supabase.from("ads").select("*").eq("category", decodedCategory);
+
+      if (cancelled) return;
+
       setAds(adsData || []);
       setLoading(false);
+    })();
+
+    return () => {
+      cancelled = true;
     };
-    loadData();
   }, [decodedCategory]);
 
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
-    setFavorites(stored);
-    if (stored.length) {
-      supabase
-        .from("ads")
-        .select("*")
-        .in("id", stored)
-        .then(({ data }) => setAllFavorites(data || []));
+    if (!favorites.length) {
+      setAllFavorites([]);
+      return;
+    }
+
+    supabase
+      .from("ads")
+      .select("*")
+      .in("id", favorites)
+      .then(({ data }) => setAllFavorites(data || []));
+  }, [favorites]);
+
+  const toggleFavorite = useCallback(async (adId) => {
+    setFavorites((prev) => {
+      const exists = prev.includes(adId);
+      const next = exists ? prev.filter((id) => id !== adId) : [...prev, adId];
+      localStorage.setItem(LS_KEY, JSON.stringify(next));
+      return next;
+    });
+
+    const { data } = await supabase.from("ads").select("*").eq("id", adId).single();
+    if (data) {
+      setAllFavorites((prev) => {
+        const exists = prev.some((a) => a.id === adId);
+        return exists ? prev.filter((a) => a.id !== adId) : [...prev, data];
+      });
     }
   }, []);
 
-  const toggleFavorite = async (adId) => {
-    if (favorites.includes(adId)) {
-      const updated = favorites.filter((id) => id !== adId);
-      saveFavorites(updated);
-      setAllFavorites((prev) => prev.filter((ad) => ad.id !== adId));
-    } else {
-      const updated = [...favorites, adId];
-      saveFavorites(updated);
-      const { data } = await supabase.from("ads").select("*").eq("id", adId).single();
-      if (data) setAllFavorites((prev) => [...prev, data]);
-    }
-  };
-
-  const removeFavorite = (adId) => {
-    const updated = favorites.filter((id) => id !== adId);
-    saveFavorites(updated);
+  const removeFavorite = useCallback((adId) => {
+    setFavorites((prev) => {
+      const next = prev.filter((id) => id !== adId);
+      localStorage.setItem(LS_KEY, JSON.stringify(next));
+      return next;
+    });
     setAllFavorites((prev) => prev.filter((ad) => ad.id !== adId));
-  };
+  }, []);
 
-  const filteredAds = selectedSub ? ads.filter((ad) => ad.sub_category?.toLowerCase() === selectedSub.toLowerCase()) : ads;
+  const filteredAds = useMemo(() => {
+    if (!selectedSub) return ads;
+    return ads.filter((ad) => ad.sub_category?.toLowerCase() === selectedSub.toLowerCase());
+  }, [ads, selectedSub]);
 
-  const SkeletonCard = () => (
-    <div className="shadow rounded-lg overflow-hidden">
-      <figure className="relative aspect-[3/3.5]">
-        <div className="bg-base-100 w-full h-full" />
-        <div className="absolute top-2 right-2 w-8 h-8 rounded-full skeleton" />
-      </figure>
-      <div className="px-3 lg:px-4 py-4 bg-base-100">
-        <div className="skeleton h-4 w-4/5 rounded mb-1" />
-        <div className="skeleton h-4 w-2/5 rounded" />
-      </div>
-    </div>
+  const skeletonCards = useMemo(
+    () =>
+      Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="shadow rounded-lg overflow-hidden">
+          <figure className="relative aspect-[3/3.5]">
+            <div className="bg-base-100 w-full h-full" />
+            <div className="absolute top-2 right-2 w-8 h-8 rounded-full skeleton" />
+          </figure>
+          <div className="px-3 lg:px-4 py-4 bg-base-100">
+            <div className="skeleton h-4 w-4/5 rounded mb-1" />
+            <div className="skeleton h-4 w-2/5 rounded" />
+          </div>
+        </div>
+      )),
+    []
   );
-
-  const skeletonCards = Array.from({ length: 5 }, (_, i) => <SkeletonCard key={i} />);
 
   return (
     <>
@@ -117,6 +153,7 @@ export default function CategoryAds() {
                     />
                   </svg>
                 </button>
+
                 <ul className="dropdown-content menu p-2 w-80 shadow bg-base-100 border border-base-300 rounded-box">
                   {allFavorites.length === 0 ? (
                     <li className="text-gray-400 py-1 text-center">Hech qanday saralanganlar yo'q</li>
@@ -131,6 +168,7 @@ export default function CategoryAds() {
                               {ad.price && <span className="text-sm text-primary">{ad.price}</span>}
                             </div>
                           </Link>
+
                           <button onClick={() => removeFavorite(ad.id)} className="btn btn-circle btn-sm btn-ghost text-error">
                             <TrashIcon className="w-4 h-4" />
                           </button>
@@ -151,6 +189,7 @@ export default function CategoryAds() {
                 <button onClick={() => setSelectedSub("")} className={`btn h-9 btn-soft ${selectedSub === "" ? "btn-primary" : ""}`}>
                   Barchasi
                 </button>
+
                 {subCategories.map((sub, i) => (
                   <button key={i} onClick={() => setSelectedSub(sub)} className={`btn h-9 btn-soft ${selectedSub === sub ? "btn-primary" : ""}`}>
                     {sub}
@@ -158,6 +197,7 @@ export default function CategoryAds() {
                 ))}
               </div>
             </div>
+
             <div className="pointer-events-none absolute top-0 right-0 h-full w-20 bg-gradient-to-l from-white via-white/80 to-transparent" />
           </div>
         )}
@@ -193,9 +233,12 @@ export default function CategoryAds() {
                         />
                       </svg>
                     </button>
+
                     {ad.sub_category && <span className="badge badge-ghost badge-sm absolute top-2 left-2 bg-white/70 backdrop-blur">{ad.sub_category}</span>}
+
                     <img src={ad.image_url} className="w-full h-full object-cover" />
                   </figure>
+
                   <div className="shadow overflow-hidden">
                     <div className="px-3 lg:px-4 py-2">
                       <h2 className="font-medium line-clamp-1">{ad.title}</h2>
