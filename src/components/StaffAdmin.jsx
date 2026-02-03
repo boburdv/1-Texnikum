@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "../supabase";
-import { PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { TrashIcon } from "@heroicons/react/24/outline";
 
 const BUCKET = "staff-photos";
 
@@ -10,7 +10,6 @@ export default function StaffAdmin({ showToast }) {
   const [items, setItems] = useState([]);
   const [loadingList, setLoadingList] = useState(true);
 
-  const [editingId, setEditingId] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [orderIndex, setOrderIndex] = useState("0");
@@ -24,7 +23,6 @@ export default function StaffAdmin({ showToast }) {
   const toastErr = useCallback((m) => showToast?.(m, "error"), [showToast]);
 
   const resetForm = useCallback(() => {
-    setEditingId(null);
     setName("");
     setDescription("");
     setOrderIndex("0");
@@ -33,7 +31,8 @@ export default function StaffAdmin({ showToast }) {
 
   const getPublicPhotoUrl = useCallback((photo_path) => {
     if (!photo_path) return null;
-    return supabase.storage.from(BUCKET).getPublicUrl(photo_path).data.publicUrl;
+    const { data } = supabase.storage.from(BUCKET).getPublicUrl(photo_path);
+    return data?.publicUrl || null;
   }, []);
 
   const fetchStaff = useCallback(async () => {
@@ -54,6 +53,7 @@ export default function StaffAdmin({ showToast }) {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return items;
+
     return items.filter((x) => {
       const n = (x.name || "").toLowerCase();
       const d = (x.description || "").toLowerCase();
@@ -68,6 +68,7 @@ export default function StaffAdmin({ showToast }) {
     const fileName = `staff/${Date.now()}-${Math.random().toString(16).slice(2)}.${ext}`;
 
     const { error } = await supabase.storage.from(BUCKET).upload(fileName, image, { upsert: true });
+
     if (error) throw new Error("Rasm yuklanmadi");
 
     return fileName;
@@ -89,22 +90,14 @@ export default function StaffAdmin({ showToast }) {
         ...(photo_path ? { photo_path } : {}),
       };
 
-      if (editingId) {
-        const { data, error } = await supabase.from("staff").update(payload).eq("id", editingId).select();
-        if (error) throw error;
+      const { data, error } = await supabase.from("staff").insert([payload]).select();
+      if (error) throw error;
 
-        if (data?.[0]) setItems((prev) => prev.map((x) => (x.id === editingId ? data[0] : x)));
-        toastOk("Xodim yangilandi");
-      } else {
-        const { data, error } = await supabase.from("staff").insert([payload]).select();
-        if (error) throw error;
-
-        if (data?.[0]) {
-          setItems((prev) => [...prev, data[0]].sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0)));
-        }
-        toastOk("Xodim qo‘shildi");
+      if (data?.[0]) {
+        setItems((prev) => [...prev, data[0]].sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0)));
       }
 
+      toastOk("Xodim qo‘shildi");
       resetForm();
     } catch (err) {
       toastErr(err?.message || "Saqlashda xatolik!");
@@ -112,14 +105,6 @@ export default function StaffAdmin({ showToast }) {
       setSaving(false);
     }
   };
-
-  const startEdit = useCallback((row) => {
-    setEditingId(row.id);
-    setName(row.name || "");
-    setDescription(row.description || "");
-    setOrderIndex(String(row.order_index ?? 0));
-    setImage(null);
-  }, []);
 
   const confirmDelete = useCallback((row) => {
     setToDelete(row);
@@ -139,14 +124,14 @@ export default function StaffAdmin({ showToast }) {
     }
 
     setItems((prev) => prev.filter((x) => x.id !== id));
-    toastErr("Xodim o‘chirildi");
+    toastOk("Xodim o‘chirildi");
     setToDelete(null);
-  }, [toDelete, toastErr]);
+  }, [toDelete, toastErr, toastOk]);
 
   return (
     <div className="flex flex-col sm:flex-row gap-6">
       <div className="flex-1 max-w-xl bg-base-100 shadow card p-6 flex flex-col">
-        <h2 className="card-title mb-4 text-center">{editingId ? "Xodimni tahrirlash" : "Xodim qo‘shish"}</h2>
+        <h2 className="card-title mb-4 text-center">Xodim qo‘shish</h2>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <input type="text" placeholder="Ism familiya" className="input w-full" value={name} onChange={(e) => setName(e.target.value)} />
@@ -159,14 +144,8 @@ export default function StaffAdmin({ showToast }) {
 
           <button type="submit" className="btn btn-primary w-full flex items-center justify-center gap-2" disabled={saving}>
             {saving && <span className="loading loading-spinner"></span>}
-            {editingId ? "Yangilash" : "Qo‘shish"}
+            Qo‘shish
           </button>
-
-          {editingId && (
-            <button type="button" className="btn w-full" onClick={resetForm}>
-              Bekor qilish
-            </button>
-          )}
         </form>
       </div>
 
@@ -188,11 +167,10 @@ export default function StaffAdmin({ showToast }) {
           ) : filtered.length > 0 ? (
             filtered.map((row) => {
               const img = getPublicPhotoUrl(row.photo_path);
+
               return (
                 <div key={row.id} className="bg-base-100 shadow transition-shadow duration-300 hover:shadow-md rounded-lg p-4 flex justify-between items-center">
                   <div className="flex items-center gap-3 pr-2 min-w-0">
-                    <div className="w-12 h-12 rounded-lg bg-base-200 overflow-hidden shrink-0">{img ? <img src={img} alt={row.name || "staff"} className="w-full h-full object-cover" /> : null}</div>
-
                     <div className="min-w-0">
                       <h3 className="font-bold truncate">{row.name}</h3>
                       <p className="text-sm text-gray-500 line-clamp-1">{row.description}</p>
@@ -200,9 +178,6 @@ export default function StaffAdmin({ showToast }) {
                   </div>
 
                   <div className="flex gap-2 shrink-0">
-                    <button className="btn btn-circle btn-ghost" onClick={() => startEdit(row)} title="Tahrirlash">
-                      <PencilIcon className="w-5 h-5" />
-                    </button>
                     <button className="btn btn-circle btn-ghost" onClick={() => confirmDelete(row)} title="O‘chirish">
                       <TrashIcon className="w-5 h-5 text-red-600" />
                     </button>
@@ -224,10 +199,11 @@ export default function StaffAdmin({ showToast }) {
             <button className="btn" onClick={() => deleteModalRef.current?.close()}>
               Bekor qilish
             </button>
+
             <button
               className="btn btn-error"
-              onClick={() => {
-                doDelete();
+              onClick={async () => {
+                await doDelete();
                 deleteModalRef.current?.close();
               }}
             >
